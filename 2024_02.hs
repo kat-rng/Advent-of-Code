@@ -10,6 +10,11 @@ lineToInts line =
 readAsInt :: String -> Integer
 readAsInt x = read x
 
+-- Find total number of matches
+countMatches :: ([Integer], Integer) -> Integer
+countMatches (list, target) = length (filter (==target) list)
+
+
 -- Compare two lists
 main = do
     -- Reading from the file
@@ -21,6 +26,5 @@ main = do
     let matrix = transpose (map lineToInts x)
     let l1 = head matrix
     let l2 = last matrix
-
 
     putStr (show result)
