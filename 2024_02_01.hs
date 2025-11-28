@@ -6,6 +6,9 @@ lineToInts :: String -> [Integer]
 lineToInts line =
     map read $ words line
 
+diffList :: [Integer] -> [Integer]
+diffList l = zipWith (-) (init l) (tail l)
+
 data ReactorDirection = Unknown
         | Increasing
         | Decreasing
@@ -23,18 +26,19 @@ checkState :: Integer -> ReactorDirection -> [Integer] -> Bool
 checkState stability direction differences
     | stability == 0                                    = False
     | length differences == 0                           = True
-    | isUnsafeDiff currentDiff                          = False
+    | isUnsafeDiff currentDiff                          = checkStateFailed
     | direction == Unknown || direction == currentDir   = checkState stability currentDir (tail differences)
-    | direction /= currentDir                           = False
+    | direction /= currentDir                           = checkStateFailed
     | otherwise                                         = undefined
     where 
         currentDir          = getState $ head differences
         currentDiff         = head differences
-        checkStateFailed    = checkState stability-1 currentDir (ignoreLastDifference (tail differences) currentDiff)
+        checkStateFailed    = checkState (stability-1) direction (ignoreLastDifference (tail differences) currentDiff)
 
 ignoreLastDifference :: [Integer] -> Integer -> [Integer]
 ignoreLastDifference differences lastdifference 
     | length differences == 0 = differences
+    | length differences == 1 = [lastdifference +head differences]
     | otherwise               = (lastdifference +head differences) : tail differences
 
 -- Sets the reactor direction to unknown for the first iteration
@@ -59,5 +63,7 @@ main = do
     let matrix      = map lineToInts x
     let diffmatrix  = map diffList matrix
     let safetys     = map newCheckState diffmatrix
-    let totalSafe   = sum $ map fromEnum safetys
+    let safetysbackwards     = map newCheckState $ map reverse diffmatrix
+    let allsafe = zipWith (||) safetys safetysbackwards
+    let totalSafe   = sum $ map fromEnum allsafe
     putStr $ show totalSafe
