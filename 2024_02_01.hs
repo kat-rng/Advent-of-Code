@@ -19,18 +19,27 @@ getState change
     | otherwise   = undefined
 
 -- Check if the reactor is unsafe and engage in recursion
-checkState :: ReactorDirection -> [Integer] -> Bool
-checkState direction differences
+checkState :: Integer -> ReactorDirection -> [Integer] -> Bool
+checkState stability direction differences
+    | stability == 0                                    = False
     | length differences == 0                           = True
-    | isUnsafeDiff $ head differences                   = False
-    | direction == Unknown || direction == currentDir   = checkState currentDir (tail differences)
+    | isUnsafeDiff currentDiff                          = False
+    | direction == Unknown || direction == currentDir   = checkState stability currentDir (tail differences)
     | direction /= currentDir                           = False
     | otherwise                                         = undefined
-    where currentDir = getState $ head differences
+    where 
+        currentDir          = getState $ head differences
+        currentDiff         = head differences
+        checkStateFailed    = checkState stability-1 currentDir (ignoreLastDifference (tail differences) currentDiff)
+
+ignoreLastDifference :: [Integer] -> Integer -> [Integer]
+ignoreLastDifference differences lastdifference 
+    | length differences == 0 = differences
+    | otherwise               = (lastdifference +head differences) : tail differences
 
 -- Sets the reactor direction to unknown for the first iteration
 newCheckState :: [Integer] -> Bool
-newCheckState = checkState Unknown
+newCheckState = checkState 2 Unknown
 
 -- Is the difference out of bounds?
 isUnsafeDiff :: Integer -> Bool
