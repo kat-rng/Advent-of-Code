@@ -13,6 +13,18 @@ strToDirection id = case id of
     'L' -> -1
     _   -> error "Bad direction ID"
 
+zeroPasses :: Int -> Int -> Int -> Int
+zeroPasses acc target loc
+    | target == 0  = acc
+    | otherwise = zeroPasses nextAcc (target-dir) (loc + dir)
+    where
+        dir = signum (target)
+        nextAcc = fromEnum (((loc+dir) `mod` 100) == 0) + acc
+
+newZeroPasses = zeroPasses 0
+
+
+
 pt1 = do
     -- Reading from the file
     handle <- openFile "2025_01_input" ReadMode
@@ -49,7 +61,7 @@ pt2 = do
     let locs = init $ map (\x -> x `mod` 100) cumsum
 
     let zipNums = zip locs deltas
-    let totalRotations = sum $ zipWith zeroPasses locs deltas
-    let rotationDat = zip zipNums (zipWith zeroPasses locs deltas)
+    let totalRotations = sum $ zipWith newZeroPasses deltas locs
+    let rotationDat = zip zipNums (zipWith newZeroPasses deltas locs)
 
     putStr $ show totalRotations
