@@ -24,7 +24,11 @@ main = do
 
     -- Find the cumulative sum (starting from 50)
     let cumsum = scanl1 (+) (50 : deltas)
+
+    -- Find the final location for each step on the dial
     let locs   = map (\x -> x `mod` 100) cumsum
+
+    -- Find the number of times said location is 0 
     let total0 = length $ filter (== 0) locs
 
     putStr $ show total0
