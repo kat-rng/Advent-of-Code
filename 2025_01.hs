@@ -45,12 +45,11 @@ pt2 = do
     -- Find the cumulative sum (starting from 50)
     let cumsum = scanl1 (+) (50 : deltas)
 
-    -- Find the final full rotation number for each step
-    let rotationLocs = map (\x -> x `div` 100) cumsum
+    -- Find the final location for each step on the dial
+    let locs = init $ map (\x -> x `mod` 100) cumsum
 
-    -- Find the number of times said location is 0 
-    let rotations = zipWith (-) (init rotationLocs) (tail rotationLocs)
-
-    let totalRotations = sum $ map abs rotations
+    let zipNums = zip locs deltas
+    let totalRotations = sum $ zipWith zeroPasses locs deltas
+    let rotationDat = zip zipNums (zipWith zeroPasses locs deltas)
 
     putStr $ show totalRotations
