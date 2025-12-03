@@ -1,5 +1,6 @@
 import Math.NumberTheory.Logarithms
 
+-- Finds repetition in integers
 isRepeatedDiv :: Integer -> Integer -> Bool
 isRepeatedDiv x slices
     | size `mod` slices /= 0 = False
