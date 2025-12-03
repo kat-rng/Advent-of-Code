@@ -23,13 +23,14 @@ readDeep :: [String] -> [Integer]
 readDeep = map read
 
 allRepeatedDiv :: Integer -> Bool
-allRepeatedDiv =
+allRepeatedDiv n = any isRepeatedCurried [2..maxSize]
     where 
         maxSize = fromIntegral (1 + integerLog10 n)
+        isRepeatedCurried = isRepeatedDiv n
 
 returnDiv :: Integer -> Integer
 returnDiv n
-    | isRepeatedDiv n 2 = n
+    | allRepeatedDiv n = n
     | otherwise       = 0
 
 seekAllInRange :: [Integer] -> Integer
