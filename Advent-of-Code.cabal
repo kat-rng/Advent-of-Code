@@ -69,7 +69,8 @@ executable Advent-of-Code
     -- Other library packages from which modules are imported.
     build-depends:    
         base ^>=4.18.3.0,
-        integer-logarithms
+        integer-logarithms,
+        split
 
     -- Directories containing source files.
     hs-source-dirs:   app
