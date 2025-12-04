@@ -72,7 +72,8 @@ executable Advent-of-Code
     build-depends:    
         base ^>=4.18.3.0,
         integer-logarithms,
-        split
+        split,
+        massiv
 
     -- Directories containing source files.
     hs-source-dirs:   app
