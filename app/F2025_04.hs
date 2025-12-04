@@ -11,8 +11,8 @@ charToInt c = case c of
     _   -> error "Invalid character"
 
 -- Converts a string representation of the input into a Massiv array
-inputToLists :: String -> Array U Ix2 Int
-inputToLists xs = A.fromLists' A.Seq intLists
+inputToArray :: String -> Array U Ix2 Int
+inputToArray xs = A.fromLists' A.Seq intLists
     where intLists = P.map (P.map charToInt) (lines xs)
 
 -- Create a stencil that finds the total neighbors that are paper rolls for each point
@@ -31,6 +31,15 @@ sum3x3Stencil = makeStencil (Sz (3 :. 3)) (1 :. 1)
 boxPad0 :: Padding Ix2 Int
 boxPad0 = Padding (Sz2 1 1) (Sz2 1 1) (Fill 0)
 
+isAccesible :: Array U Ix2 Int -> Array U Ix2 Int
+isAccesible a = do
+    -- Pad the array
+    let padA = applyStencil boxPad0 sum3x3Stencil a
+
+    -- Determine accessibility
+    let isAccess = A.map (\x -> fromEnum (x<4)) (A.computeAs U padA)
+    A.computeAs U isAccess
+
 pt1 :: IO ()
 pt1 = do
     -- Reading from the file
@@ -38,17 +47,10 @@ pt1 = do
     contents <- hGetContents handle
 
     -- Get the list contents
-    let arr = inputToLists contents
-
-    -- Pad the array
-    let padArr = applyStencil boxPad0 sum3x3Stencil arr
-
-    -- Determine accessibility
-    let isAccessible = A.map (\x -> fromEnum (x<4)) (A.computeAs U padArr)
-    let isAccessibleU = A.computeAs U isAccessible
+    let arr = inputToArray contents
 
     --Find the total accessible paper rolls
-    let totalAcc =  A.sum $ A.zipWith (*) isAccessibleU arr 
+    let totalAcc =  A.sum $ A.zipWith (*) (isAccesible arr) arr 
     putStr $ show totalAcc
 
 pt2 = do
