@@ -4,16 +4,21 @@ import System.IO
 import Data.List
 
 -- read the input into a set of columns of numbers (ns) and operations (os)
-readInput :: String -> ([[Integer]], String)
+readInput :: String -> ([[String]], String)
 readInput s = do
     let xs = map words $ lines s
-    let ns = map (map read) $ init xs
+    let ns = init xs
     let os = map head $ last xs
     (transpose ns, os)
 
 -- zip the lists into tuples of "math problems"
-readTuples :: ([[Integer]], String) -> [([Integer], Char)]
+readTuples :: ([[String]], String) -> [([String], Char)]
 readTuples (ns, os) = zip ns os
+
+readIntegers :: ([[String]], String) -> [([Integer], Char)]
+readIntegers (ns, os) = do
+    let ns_int = map (map read) ns
+    zip ns_int os
 
 -- Apply the operation defined by the char on the integers
 applyOperation :: ([Integer], Char) -> Integer
@@ -29,7 +34,7 @@ pt1 = do
     contents <- hGetContents handle
 
     -- Get the total fresh
-    let input = readTuples $ readInput contents
+    let input = readIntegers $ readInput contents
     let output = sum $ map applyOperation input
     -- print it
     putStr $ show output
