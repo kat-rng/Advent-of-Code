@@ -3,6 +3,8 @@ module F2025_06 (pt1, pt2) where
 import System.IO
 import Data.List
 import Text.Printf
+import Data.List.Split
+import Debug.Trace
 
 -- read the input into a set of columns of numbers (ns) and operations (os)
 readInput :: String -> ([[String]], String)
@@ -36,6 +38,37 @@ transposeStrings (strs, op) = do
     let ints = map (read . head . words)$ transpose padStrs
     (ints, op)
 
+-- Read input with uniform width for each column
+readInputFixedWidth :: String -> ([[String]], String)
+readInputFixedWidth s = do
+    let xs = transpose $ lines s
+    let splitUp = breakList xs
+    let ns = transpose $ init splitUp
+    let os = map (head . head . words) $ last splitUp
+    (transpose ns, os)
+
+-- break the list at locations where there is whitespace
+-- formatted 1-(n-1) in the top level list is lists of numbers 
+--           n       in the top level list are the operations
+breakList :: [String] -> [[String]]
+breakList xs = do
+    let isBreak = trace (show xs) map (\x -> all (== head x) x) xs
+    let breaksX = trace (show isBreak) zipWith replaceWithXs xs isBreak
+    map (splitOn "X") $ transpose breaksX
+
+
+
+
+
+
+
+-- replace places where the boolean is true with Xs
+replaceWithXs :: String -> Bool -> String
+replaceWithXs s b = do
+    if b then   replicate (length s) 'X'
+    else        s
+
+
 pt1 :: IO ()
 pt1 = do
     -- Reading from the file
@@ -54,7 +87,6 @@ pt2 = do
     handle <- openFile "2025_06_input" ReadMode
     contents <- hGetContents handle
 
-    let input = map transposeStrings $ readTuples $ readInput contents
-    let output = map applyOperation input
+    let input = readInputFixedWidth contents
 
     putStr $ show input
