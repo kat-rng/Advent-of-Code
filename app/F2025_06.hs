@@ -2,6 +2,7 @@ module F2025_06 (pt1, pt2) where
 
 import System.IO
 import Data.List
+import Text.Printf
 
 -- read the input into a set of columns of numbers (ns) and operations (os)
 readInput :: String -> ([[String]], String)
@@ -28,6 +29,13 @@ applyOperation (ints, op) = case op of
     '+' -> sum      ints
     _   -> error "invalid operation"
 
+transposeStrings :: ([String], Char) -> ([Integer], Char)
+transposeStrings (strs, op) = do
+    let padSize = maximum $ map length strs
+    let padStrs = map (printf "%*s" padSize) strs
+    let ints = map (read . head . words)$ transpose padStrs
+    (ints, op)
+
 pt1 :: IO ()
 pt1 = do
     -- Reading from the file
@@ -42,6 +50,12 @@ pt1 = do
 
 pt2 :: IO ()
 pt2 = do
+    -- Reading from the file
+    handle <- openFile "2025_06_input" ReadMode
+    contents <- hGetContents handle
 
-    putStr "Nothing"
+    let input = map transposeStrings $ readTuples $ readInput contents
+    let output = sum $ map applyOperation input
+
+    putStr $ show output
 
