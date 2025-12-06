@@ -3,7 +3,6 @@ module F2025_05 (pt1, pt2) where
 import System.IO
 import Data.List.Split
 import Data.List
-import Text.ParserCombinators.ReadP (satisfy)
 
 -- Reads the ranges and ids 
 -- This assumes the blank line between them has been removed
@@ -102,7 +101,7 @@ pt2 = do
     contents <- hGetContents handle
 
     -- Get the list contents
-    let (ranges, ids) = readInput contents
+    let (ranges, _) = readInput contents
 
     -- print the total bounds the id ranges label as fresh
     putStr $ show $ totalBounds ranges
