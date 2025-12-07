@@ -31,6 +31,7 @@ applyOperation (ints, op) = case op of
     '+' -> sum      ints
     _   -> error "invalid operation"
 
+-- just transposes teh input string and converts to integers. the padding doesn't matter
 transposeStrings :: ([String], Char) -> ([Integer], Char)
 transposeStrings (strs, op) = do
     let padSize = maximum $ map length strs
@@ -55,12 +56,6 @@ breakList xs = do
     let isBreak = map (\x -> all (== head x) x) xs
     let breaksX = zipWith replaceWithXs xs isBreak
     map (splitOn "X") $ transpose breaksX
-
-
-
-
-
-
 
 -- replace places where the boolean is true with Xs
 replaceWithXs :: String -> Bool -> String
