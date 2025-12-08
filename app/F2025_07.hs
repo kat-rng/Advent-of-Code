@@ -10,33 +10,39 @@ processListStart xs = do
     let startIndex = elemIndex 'S' $ head xs
     case startIndex of
         Nothing     -> error "No start point"
-        Just num    -> recursiveSplit xs 1 num
+        Just num    -> recursiveSplit xs 1 num []
 
 -- recursively checks through the array to find splits
 -- Returns a list of every coordinate of split found
-recursiveSplit ::  [String] -> Int -> Int -> [(Int, Int)]
-recursiveSplit lists layerN i = case mLists of
+recursiveSplit ::  [String] -> Int -> Int -> [(Int, Int)] -> [(Int, Int)]
+recursiveSplit lists layerN i cull = case mLists of
     Nothing -> []
     -- If there is a layer here then solve it
-    Just jLists -> solveCurrentLayer jLists layerN i
+    Just jLists -> solveCurrentLayer jLists layerN i cull
     where 
         mLists = uncons lists
 
 -- Identify if there is a split at this index
 -- if so send it to the handlers
-solveCurrentLayer :: (String, [String]) -> Int -> Int -> [(Int, Int)]
-solveCurrentLayer (currentList, nextLists) layerN i = do 
+solveCurrentLayer :: (String, [String]) -> Int -> Int -> [(Int, Int)] -> [(Int, Int)]
+solveCurrentLayer (currentList, nextLists) layerN i cull = do 
     if isSplit then
-        -- append the split to the list
-        (i, layerN) : handleSplit nextLists i layerN
+        -- check if this branch has already been searched
+        if (i, layerN) `elem` cull then
+            []
+        else
+            -- if not then continue
+            (i, layerN) : handleSplit nextLists i layerN cull
     else
-        recursiveSplit nextLists (layerN+1) i
+        recursiveSplit nextLists (layerN+1) i cull
     where isSplit = '^' == currentList !! i 
 
 -- splits the lines of search
-handleSplit :: [String] -> Int -> Int -> [(Int, Int)]
-handleSplit nextLists i layerN = do
-    currSplit (i+1) ++ currSplit (i-1)
+handleSplit :: [String] -> Int -> Int -> [(Int, Int)] -> [(Int, Int)]
+handleSplit nextLists i layerN cull = do
+    let l1 = currSplit (i-1) cull
+    let l2 = currSplit (i+1) (l1++cull)
+    l1 ++ l2
     where 
         currSplit = recursiveSplit nextLists (layerN+1)
 
